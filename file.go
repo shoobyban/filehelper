@@ -13,6 +13,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 
@@ -128,6 +129,11 @@ func last(x int, a interface{}) bool {
 	return x == reflect.ValueOf(a).Len()-1
 }
 
+func reReplaceAll(pattern, repl, text string) string {
+	re := regexp.MustCompile(pattern)
+	return re.ReplaceAllString(text, repl)
+}
+
 // Template parses string as Go template, using data as scope
 func Template(str string, data interface{}) string {
 	fmap := template.FuncMap{
@@ -136,6 +142,11 @@ func Template(str string, data interface{}) string {
 		"sanitise":     sanitise,
 		"sanitize":     sanitise,
 		"last":         last,
+		"reReplaceAll": reReplaceAll,
+		"match":        regexp.MatchString,
+		"title":        strings.Title,
+		"toUpper":      strings.ToUpper,
+		"toLower":      strings.ToLower,
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
