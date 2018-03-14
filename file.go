@@ -14,8 +14,12 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"time"
+
+	"github.com/kennygrant/sanitize"
 
 	"github.com/clbanning/mxj"
+	"github.com/robertkrimen/otto"
 	"github.com/shoobyban/slog"
 )
 
@@ -95,15 +99,74 @@ func SplitKeys(v interface{}) ([]string, []map[string]interface{}, error) {
 	return keys, values, nil
 }
 
-// Template parses string as remplate, using data
+func formatUKDate(datestring string) string {
+	layout := "2006-01-02 15:04:05"
+	t, err := time.Parse(layout, datestring)
+	if err != nil {
+		return datestring
+	}
+	year, month, day := t.Date()
+	return fmt.Sprintf("%d/%d/%d", day, month, year)
+}
+
+func limit(data interface{}, length int) interface{} {
+	if reflect.ValueOf(data).Kind() == reflect.String {
+		return fmt.Sprintf(fmt.Sprintf("%%%ds", length), data)
+	} else if reflect.ValueOf(data).Kind() == reflect.Int {
+		return fmt.Sprintf(fmt.Sprintf("%%%dd", length), data)
+	} else if reflect.ValueOf(data).Kind() == reflect.Float32 {
+		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
+	}
+	return data
+}
+
+func sanitise(str string) string {
+	return sanitize.Name(strings.Replace(str, "/", " ", -1))
+}
+
+func last(x int, a interface{}) bool {
+	return x == reflect.ValueOf(a).Len()-1
+}
+
+// Template parses string as Go template, using data as scope
 func Template(str string, data interface{}) string {
-	tmpl, err := template.New("test").Parse(str)
+	fmap := template.FuncMap{
+		"formatUKDate": formatUKDate,
+		"limit":        limit,
+		"sanitise":     sanitise,
+		"sanitize":     sanitise,
+		"last":         last,
+	}
+	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
 		var doc bytes.Buffer
 		tmpl.Execute(&doc, data)
-		return doc.String()
+		return strings.Replace(doc.String(), "<no value>", "", -1)
 	}
 	return str
+}
+
+// ProcessTemplateFile processes golang template file
+func ProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
+	tf, err := os.Open(template)
+	if err != nil {
+		return nil, err
+	}
+	byteValue, _ := ioutil.ReadAll(tf)
+	xml := Template(string(byteValue), bundle)
+	return []byte(xml), nil
+}
+
+// JSTemplate parses JS code as template, using data as scope
+func JSTemplate(str string, data interface{}) string {
+	vm := otto.New()
+	scope, err := json.Marshal(data)
+	script := "botl=" + string(scope) + ";" + str
+	value, err := vm.Run(script)
+	if err == nil {
+		return value.String()
+	}
+	return ""
 }
 
 // WriteTar will append to datafile with filename using buf data
@@ -127,6 +190,7 @@ func WriteTar(datafile, filename string, buf []byte) {
 	hdr := &tar.Header{
 		Name:     filename,
 		Typeflag: tar.TypeReg,
+		Mode:     0644,
 		Size:     int64(len(buf)),
 	}
 	slog.Infof("Writing %s %d", filename, int64(len(buf)))
