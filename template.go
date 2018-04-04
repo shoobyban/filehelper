@@ -9,6 +9,7 @@ import (
 	"os"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -65,6 +66,17 @@ func timestamp() string {
 	return time.Now().String()
 }
 
+func empty(a interface{}) string {
+	k := reflect.ValueOf(a).Kind()
+	if k == reflect.Map {
+		if reflect.ValueOf(a).Len() == 0 {
+			return ""
+		}
+		return fmt.Sprint(a)
+	}
+	return string(a.(string))
+}
+
 func asJSON(s interface{}) string {
 	jsonBytes, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
@@ -73,8 +85,16 @@ func asJSON(s interface{}) string {
 	return string(jsonBytes)
 }
 
+func filterPath(s interface{}, p string) interface{} {
+	return pathValue(strings.Split(p, "."), s, "")
+}
+
+func concat(ss ...string) string {
+	return strings.Join(ss, "")
+}
+
 // Template parses string as Go template, using data as scope
-func Template(str string, data interface{}) string {
+func Template(str string, data interface{}) (string, error) {
 	fmap := template.FuncMap{
 		"formatUKDate": formatUKDate,
 		"limit":        limit,
@@ -91,14 +111,20 @@ func Template(str string, data interface{}) string {
 		"json":         asJSON,
 		"upper":        strings.ToUpper,
 		"lower":        strings.ToLower,
+		"filter":       filterPath,
+		"concat":       concat,
+		"empty":        empty,
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
 		var doc bytes.Buffer
-		tmpl.Execute(&doc, data)
-		return strings.Replace(doc.String(), "<no value>", "", -1)
+		err = tmpl.Execute(&doc, data)
+		if err != nil {
+			return "", err
+		}
+		return strings.Replace(doc.String(), "<no value>", "", -1), nil
 	}
-	return str
+	return "", err
 }
 
 // ProcessTemplateFile processes golang template file
@@ -108,8 +134,11 @@ func ProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
 		return nil, err
 	}
 	byteValue, _ := ioutil.ReadAll(tf)
-	xml := Template(string(byteValue), bundle)
-	return []byte(xml), nil
+	output, err := Template(string(byteValue), bundle)
+	if err != nil {
+		return []byte{}, err
+	}
+	return []byte(output), nil
 }
 
 // JSTemplate parses JS code as template, using data as scope
@@ -122,4 +151,82 @@ func JSTemplate(str string, data interface{}) string {
 		return value.String()
 	}
 	return ""
+}
+
+func pathValue(keys []string, s interface{}, f string) (v interface{}) {
+	var key string
+	var nextkeys []string
+	if len(keys) == 0 {
+		if f == "" {
+			return s
+		}
+		key = ""
+		nextkeys = keys
+	} else {
+		key = keys[0]
+		nextkeys = keys[1:]
+	}
+	filter := ""
+	var (
+		i  int64
+		ok bool
+	)
+	var err error
+
+	if key != "" && key[:1] == "[" && key[len(key)-1:] == "]" {
+		key, filter = "", key[1:len(key)-1]
+	}
+
+	switch s.(type) {
+	case map[string]interface{}:
+		if key == "" {
+			m := map[string]interface{}{}
+			found := true
+			if f != "" {
+				found = false
+				fparts := strings.Split(f, "=")
+				for k, item := range s.(map[string]interface{}) {
+					if k == fparts[0] && item == fparts[1] {
+						found = true
+					}
+				}
+			}
+			if found {
+				for k, item := range s.(map[string]interface{}) {
+					m[k] = pathValue(nextkeys, item, filter)
+				}
+			}
+			if len(m) > 0 {
+				v = m
+			}
+		} else if v, ok = s.(map[string]interface{})[key]; !ok {
+			err = fmt.Errorf("Key not present. [Key:%s]", key)
+		}
+	case []interface{}:
+		array := s.([]interface{})
+		a := []interface{}{}
+		if f != "" {
+			return a
+		}
+		if key == "" {
+			for _, item := range array {
+				pv := pathValue(nextkeys, item, filter)
+				if pv != nil {
+					a = append(a, pv)
+				}
+			}
+			if len(a) == 1 {
+				v = a[0]
+			} else if len(a) > 0 {
+				v = a
+			}
+		} else if i, err = strconv.ParseInt(key, 10, 64); err == nil {
+			if int(i) < len(array) {
+				v = array[i]
+			} else {
+				err = fmt.Errorf("Index out of bounds. [Index:%d] [Array:%v]", i, array)
+			}
+		}
+	}
+	return pathValue(nextkeys, v, "")
 }
