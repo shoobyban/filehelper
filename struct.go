@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/clbanning/mxj"
+	"github.com/shoobyban/mxj"
 	"github.com/shoobyban/slog"
 )
 

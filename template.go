@@ -93,6 +93,38 @@ func concat(ss ...string) string {
 	return strings.Join(ss, "")
 }
 
+func toint(s string) int {
+	i, _ := strconv.Atoi(s)
+	return i
+}
+
+func conditional(s1, s2 string) string {
+	if s1 != "" {
+		return s1
+	}
+	return s2
+}
+
+func notconditional(s1, s2 string) string {
+	if s1 == "" {
+		return s1
+	}
+	return s2
+}
+
+func mapto(item, mapvals, separators string) string {
+	maps := strings.Split(mapvals, separators[:1])
+	mapping := map[string]string{}
+	for _, v := range maps {
+		vv := strings.Split(v, separators[1:])
+		mapping[vv[0]] = vv[1]
+	}
+	if ret, ok := mapping[item]; ok {
+		return ret
+	}
+	return ""
+}
+
 // Template parses string as Go template, using data as scope
 func Template(str string, data interface{}) (string, error) {
 	fmap := template.FuncMap{
@@ -114,6 +146,10 @@ func Template(str string, data interface{}) (string, error) {
 		"filter":       filterPath,
 		"concat":       concat,
 		"empty":        empty,
+		"int":          toint,
+		"ifthen":       conditional,
+		"elseifthen":   notconditional,
+		"mapto":        mapto,
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
@@ -129,6 +165,20 @@ func Template(str string, data interface{}) (string, error) {
 
 // ProcessTemplateFile processes golang template file
 func ProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
+	tf, err := os.Open(template)
+	if err != nil {
+		return nil, err
+	}
+	byteValue, _ := ioutil.ReadAll(tf)
+	output, err := Template(string(byteValue), bundle)
+	if err != nil {
+		return []byte{}, err
+	}
+	return []byte(output), nil
+}
+
+// ProcessTemplateFile processes golang template file
+func MustProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
 	tf, err := os.Open(template)
 	if err != nil {
 		return nil, err

@@ -4,15 +4,16 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"reflect"
 )
 
 // WriteCSV writes headers and rows into a given file handle
-func WriteCSV(file *os.File, columns []string, rows []map[string]interface{}) error {
+func WriteCSV(file *os.File, columns []string, rows []map[string]interface{}) ([]byte, error) {
 	w := csv.NewWriter(file)
 	if err := w.Write(columns); err != nil {
-		return err
+		return nil, err
 	}
 	r := make([]string, len(columns))
 	var ok bool
@@ -20,15 +21,16 @@ func WriteCSV(file *os.File, columns []string, rows []map[string]interface{}) er
 		for i, column := range columns {
 			if r[i], ok = row[column].(string); !ok {
 				message := fmt.Sprintf("type is %T in cell for value %v", row[column], row[column])
-				return errors.New(message)
+				return nil, errors.New(message)
 			}
 		}
 		if err := w.Write(r); err != nil {
-			return err
+			return nil, err
 		}
 	}
 	w.Flush()
-	return nil
+	byteValue, _ := ioutil.ReadAll(file)
+	return byteValue, nil
 }
 
 // SplitKeys creates a map for CSV header
