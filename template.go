@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
-	"github.com/robertkrimen/otto"
+	//	"github.com/robertkrimen/otto"
 )
 
 func formatUKDate(datestring string) string {
@@ -177,7 +177,7 @@ func ProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
 	return []byte(output), nil
 }
 
-// ProcessTemplateFile processes golang template file
+// MustProcessTemplateFile processes golang template file
 func MustProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
 	tf, err := os.Open(template)
 	if err != nil {
@@ -191,17 +191,17 @@ func MustProcessTemplateFile(template string, bundle interface{}) ([]byte, error
 	return []byte(output), nil
 }
 
-// JSTemplate parses JS code as template, using data as scope
-func JSTemplate(str string, data interface{}) string {
-	vm := otto.New()
-	scope, err := json.Marshal(data)
-	script := "botl=" + string(scope) + ";" + str
-	value, err := vm.Run(script)
-	if err == nil {
-		return value.String()
-	}
-	return ""
-}
+// // JSTemplate parses JS code as template, using data as scope
+// func JSTemplate(str string, data interface{}) string {
+// 	vm := otto.New()
+// 	scope, err := json.Marshal(data)
+// 	script := "botl=" + string(scope) + ";" + str
+// 	value, err := vm.Run(script)
+// 	if err == nil {
+// 		return value.String()
+// 	}
+// 	return ""
+// }
 
 func pathValue(keys []string, s interface{}, f string) (v interface{}) {
 	var key string
