@@ -17,14 +17,31 @@ import (
 	//	"github.com/robertkrimen/otto"
 )
 
-func formatUKDate(datestring string) string {
+func item(s, sep string, num int) string {
+	i := strings.Split(s, sep)
+	return i[num]
+}
+
+func dateFmt(format, datestring string) string {
+	if format == "ukshort" {
+		format = "02/01/06"
+	}
 	layout := "2006-01-02 15:04:05"
 	t, err := time.Parse(layout, datestring)
 	if err != nil {
 		return datestring
 	}
-	year, month, day := t.Date()
-	return fmt.Sprintf("%d/%d/%d", day, month, year)
+	return t.Format(format)
+}
+
+func decimalFmt(format, num string) string {
+	f, _ := strconv.ParseFloat(num, 64)
+	i := strings.Split(format, ",")
+	return fmt.Sprintf(fmt.Sprintf("%%%s.%sf", i[0], i[1]), f)
+}
+
+func formatUKDate(datestring string) string {
+	return dateFmt("ukshort", datestring)
 }
 
 func limit(data interface{}, length int) interface{} {
@@ -38,7 +55,18 @@ func limit(data interface{}, length int) interface{} {
 	return data
 }
 
-func fixlen(data interface{}, length int) interface{} {
+func fixlen(length int, data interface{}) interface{} {
+	if reflect.ValueOf(data).Kind() == reflect.String {
+		return fmt.Sprintf(fmt.Sprintf("%%-%d.%ds", length, length), data)
+	} else if reflect.ValueOf(data).Kind() == reflect.Int {
+		return fmt.Sprintf(fmt.Sprintf("%%-%d.%dd", length, length), data)
+	} else if reflect.ValueOf(data).Kind() == reflect.Float32 {
+		return fmt.Sprintf(fmt.Sprintf("%%-%d.4f", length), data)
+	}
+	return data
+}
+
+func fixlenright(length int, data interface{}) interface{} {
 	if reflect.ValueOf(data).Kind() == reflect.String {
 		return fmt.Sprintf(fmt.Sprintf("%%%d.%ds", length, length), data)
 	} else if reflect.ValueOf(data).Kind() == reflect.Int {
@@ -131,25 +159,29 @@ func Template(str string, data interface{}) (string, error) {
 		"formatUKDate": formatUKDate,
 		"limit":        limit,
 		"fixlen":       fixlen,
+		"fixlenr":      fixlenright,
 		"sanitise":     sanitise,
 		"sanitize":     sanitise,
 		"last":         last,
 		"reReplaceAll": reReplaceAll,
 		"match":        regexp.MatchString,
 		"title":        strings.Title,
-		"toUpper":      strings.ToUpper,
-		"toLower":      strings.ToLower,
 		"timestamp":    timestamp,
 		"json":         asJSON,
+		"toUpper":      strings.ToUpper,
 		"upper":        strings.ToUpper,
+		"toLower":      strings.ToLower,
 		"lower":        strings.ToLower,
 		"filter":       filterPath,
-		"concat":       concat,
-		"empty":        empty,
-		"int":          toint,
-		"ifthen":       conditional,
-		"elseifthen":   notconditional,
-		"mapto":        mapto,
+		"concat":       concat,         // concat "a" "b" => "ab"
+		"empty":        empty,          // empty [] => "", ["bah"] => "bah"
+		"int":          toint,          // int "0123" => 123
+		"ifthen":       conditional,    // ifthen "a" "b" => a, ifthen "" "b" => b
+		"elseifthen":   notconditional, // elseifthen "a" "b" => b, elseifthen "" "b" => ""
+		"mapto":        mapto,          // mapto "a" "a:True|b:False" "|:" => True
+		"date":         dateFmt,        // "2017-03-31 19:59:11" |  date "06.01.02" => "17.03.31"
+		"decimal":      decimalFmt,     // 3.1415 decimal 6,2 => 3.14
+		"item":         item,           // item "a:b" ":" 0 => a
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
