@@ -51,6 +51,8 @@ func limit(data interface{}, length int) interface{} {
 		return fmt.Sprintf(fmt.Sprintf("%%%dd", length), data)
 	} else if reflect.ValueOf(data).Kind() == reflect.Float32 {
 		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
+	} else if reflect.ValueOf(data).Kind() == reflect.Float64 {
+		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
 	}
 	return data
 }
@@ -62,8 +64,10 @@ func fixlen(length int, data interface{}) interface{} {
 		return fmt.Sprintf(fmt.Sprintf("%%-%d.%dd", length, length), data)
 	} else if reflect.ValueOf(data).Kind() == reflect.Float32 {
 		return fmt.Sprintf(fmt.Sprintf("%%-%d.4f", length), data)
+	} else if reflect.ValueOf(data).Kind() == reflect.Float64 {
+		return fmt.Sprintf(fmt.Sprintf("%%-%d.4f", length), data)
 	}
-	return data
+	return strings.Repeat(" ", length)
 }
 
 func fixlenright(length int, data interface{}) interface{} {
@@ -74,7 +78,7 @@ func fixlenright(length int, data interface{}) interface{} {
 	} else if reflect.ValueOf(data).Kind() == reflect.Float32 {
 		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
 	}
-	return data
+	return strings.Repeat(" ", length)
 }
 
 func sanitise(str string) string {
