@@ -17,6 +17,19 @@ import (
 	//	"github.com/robertkrimen/otto"
 )
 
+type variable struct {
+	Value interface{}
+}
+
+func (v *variable) Set(value interface{}) string {
+	v.Value = value
+	return ""
+}
+
+func newVariable(initialValue interface{}) *variable {
+	return &variable{initialValue}
+}
+
 func item(s, sep string, num int) string {
 	i := strings.Split(s, sep)
 	return i[num]
@@ -45,37 +58,36 @@ func formatUKDate(datestring string) string {
 }
 
 func limit(data interface{}, length int) interface{} {
-	if reflect.ValueOf(data).Kind() == reflect.String {
+	switch reflect.ValueOf(data).Kind() {
+	case reflect.String:
 		return fmt.Sprintf(fmt.Sprintf("%%%ds", length), data)
-	} else if reflect.ValueOf(data).Kind() == reflect.Int {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return fmt.Sprintf(fmt.Sprintf("%%%dd", length), data)
-	} else if reflect.ValueOf(data).Kind() == reflect.Float32 {
-		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
-	} else if reflect.ValueOf(data).Kind() == reflect.Float64 {
+	case reflect.Float32, reflect.Float64:
 		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
 	}
 	return data
 }
 
 func fixlen(length int, data interface{}) interface{} {
-	if reflect.ValueOf(data).Kind() == reflect.String {
+	switch reflect.ValueOf(data).Kind() {
+	case reflect.String:
 		return fmt.Sprintf(fmt.Sprintf("%%-%d.%ds", length, length), data)
-	} else if reflect.ValueOf(data).Kind() == reflect.Int {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return fmt.Sprintf(fmt.Sprintf("%%-%d.%dd", length, length), data)
-	} else if reflect.ValueOf(data).Kind() == reflect.Float32 {
-		return fmt.Sprintf(fmt.Sprintf("%%-%d.4f", length), data)
-	} else if reflect.ValueOf(data).Kind() == reflect.Float64 {
+	case reflect.Float32, reflect.Float64:
 		return fmt.Sprintf(fmt.Sprintf("%%-%d.4f", length), data)
 	}
 	return strings.Repeat(" ", length)
 }
 
 func fixlenright(length int, data interface{}) interface{} {
-	if reflect.ValueOf(data).Kind() == reflect.String {
+	switch reflect.ValueOf(data).Kind() {
+	case reflect.String:
 		return fmt.Sprintf(fmt.Sprintf("%%%d.%ds", length, length), data)
-	} else if reflect.ValueOf(data).Kind() == reflect.Int {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return fmt.Sprintf(fmt.Sprintf("%%%d.%dd", length, length), data)
-	} else if reflect.ValueOf(data).Kind() == reflect.Float32 {
+	case reflect.Float32, reflect.Float64:
 		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
 	}
 	return strings.Repeat(" ", length)
@@ -157,6 +169,182 @@ func mapto(item, mapvals, separators string) string {
 	return ""
 }
 
+// add returns the sum of a and b.
+func add(b, a interface{}) (interface{}, error) {
+	av := reflect.ValueOf(a)
+	bv := reflect.ValueOf(b)
+
+	switch av.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return av.Int() + bv.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Int() + int64(bv.Uint()), nil
+		case reflect.Float32, reflect.Float64:
+			return float64(av.Int()) + bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("add: unknown type for %q (%T)", bv, b)
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return int64(av.Uint()) + bv.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Uint() + bv.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			return float64(av.Uint()) + bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("add: unknown type for %q (%T)", bv, b)
+		}
+	case reflect.Float32, reflect.Float64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return av.Float() + float64(bv.Int()), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Float() + float64(bv.Uint()), nil
+		case reflect.Float32, reflect.Float64:
+			return av.Float() + bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("add: unknown type for %q (%T)", bv, b)
+		}
+	default:
+		return nil, fmt.Errorf("add: unknown type for %q (%T)", av, a)
+	}
+}
+
+// subtract returns the difference of b from a.
+func subtract(b, a interface{}) (interface{}, error) {
+	av := reflect.ValueOf(a)
+	bv := reflect.ValueOf(b)
+
+	switch av.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return av.Int() - bv.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Int() - int64(bv.Uint()), nil
+		case reflect.Float32, reflect.Float64:
+			return float64(av.Int()) - bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("subtract: unknown type for %q (%T)", bv, b)
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return int64(av.Uint()) - bv.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Uint() - bv.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			return float64(av.Uint()) - bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("subtract: unknown type for %q (%T)", bv, b)
+		}
+	case reflect.Float32, reflect.Float64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return av.Float() - float64(bv.Int()), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Float() - float64(bv.Uint()), nil
+		case reflect.Float32, reflect.Float64:
+			return av.Float() - bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("subtract: unknown type for %q (%T)", bv, b)
+		}
+	default:
+		return nil, fmt.Errorf("subtract: unknown type for %q (%T)", av, a)
+	}
+}
+
+// multiply returns the product of a and b.
+func multiply(b, a interface{}) (interface{}, error) {
+	av := reflect.ValueOf(a)
+	bv := reflect.ValueOf(b)
+
+	switch av.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return av.Int() * bv.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Int() * int64(bv.Uint()), nil
+		case reflect.Float32, reflect.Float64:
+			return float64(av.Int()) * bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("multiply: unknown type for %q (%T)", bv, b)
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return int64(av.Uint()) * bv.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Uint() * bv.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			return float64(av.Uint()) * bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("multiply: unknown type for %q (%T)", bv, b)
+		}
+	case reflect.Float32, reflect.Float64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return av.Float() * float64(bv.Int()), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Float() * float64(bv.Uint()), nil
+		case reflect.Float32, reflect.Float64:
+			return av.Float() * bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("multiply: unknown type for %q (%T)", bv, b)
+		}
+	default:
+		return nil, fmt.Errorf("multiply: unknown type for %q (%T)", av, a)
+	}
+}
+
+// divide returns the division of b from a.
+func divide(b, a interface{}) (interface{}, error) {
+	av := reflect.ValueOf(a)
+	bv := reflect.ValueOf(b)
+
+	switch av.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return av.Int() / bv.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Int() / int64(bv.Uint()), nil
+		case reflect.Float32, reflect.Float64:
+			return float64(av.Int()) / bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("divide: unknown type for %q (%T)", bv, b)
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return int64(av.Uint()) / bv.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Uint() / bv.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			return float64(av.Uint()) / bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("divide: unknown type for %q (%T)", bv, b)
+		}
+	case reflect.Float32, reflect.Float64:
+		switch bv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return av.Float() / float64(bv.Int()), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return av.Float() / float64(bv.Uint()), nil
+		case reflect.Float32, reflect.Float64:
+			return av.Float() / bv.Float(), nil
+		default:
+			return nil, fmt.Errorf("divide: unknown type for %q (%T)", bv, b)
+		}
+	default:
+		return nil, fmt.Errorf("divide: unknown type for %q (%T)", av, a)
+	}
+}
+
 // Template parses string as Go template, using data as scope
 func Template(str string, data interface{}) (string, error) {
 	fmap := template.FuncMap{
@@ -186,6 +374,11 @@ func Template(str string, data interface{}) (string, error) {
 		"date":         dateFmt,        // "2017-03-31 19:59:11" |  date "06.01.02" => "17.03.31"
 		"decimal":      decimalFmt,     // 3.1415 decimal 6,2 => 3.14
 		"item":         item,           // item "a:b" ":" 0 => a
+		"add":          add,
+		"sub":          subtract,
+		"div":          divide,
+		"mul":          multiply,
+		"var":          newVariable,
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
