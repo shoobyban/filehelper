@@ -47,7 +47,7 @@ func TestTemplate(t *testing.T) {
 		},
 		"limit": testStruct{
 			Template: `{{ limit "1234567890" 3 }}|{{ limit 1234 3 }}|{{ limit "12" 3 }}`,
-			Result:   `123|123|12`,
+			Result:   `123|1234|12`,
 		},
 	}
 	for name, test := range tests {
