@@ -60,11 +60,15 @@ func formatUKDate(datestring string) string {
 func limit(data interface{}, length int) interface{} {
 	switch reflect.ValueOf(data).Kind() {
 	case reflect.String:
-		return fmt.Sprintf(fmt.Sprintf("%%%ds", length), data)
+		if len(data.(string)) > length {
+			return data.(string)[:length]
+		}
+		return data
+
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return fmt.Sprintf(fmt.Sprintf("%%%dd", length), data)
+		return fmt.Sprintf(fmt.Sprintf("%%-%dd", length), data)
 	case reflect.Float32, reflect.Float64:
-		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
+		return fmt.Sprintf(fmt.Sprintf("%%-%d.4f", length), data)
 	}
 	return data
 }

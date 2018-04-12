@@ -45,6 +45,10 @@ func TestTemplate(t *testing.T) {
 			Template: `'{{int "0123"}}'`,
 			Result:   `'123'`,
 		},
+		"limit": testStruct{
+			Template: `{{ limit "1234567890" 3 }}|{{ limit 1234 3 }}|{{ limit "12" 3 }}`,
+			Result:   `123|123|12`,
+		},
 	}
 	for name, test := range tests {
 		res, err := Template(test.Template, test.Values)
