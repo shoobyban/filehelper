@@ -114,15 +114,19 @@ func timestamp() string {
 	return time.Now().String()
 }
 
-func empty(a interface{}) string {
+func empty(a interface{}) interface{} {
 	k := reflect.ValueOf(a).Kind()
-	if k == reflect.Map {
-		if reflect.ValueOf(a).Len() == 0 {
-			return ""
-		}
-		return fmt.Sprint(a)
+	if k == reflect.Int || k == reflect.Int16 || k == reflect.Int32 ||
+		k == reflect.Int64 || k == reflect.Int8 || k == reflect.Bool ||
+		k == reflect.Float32 || k == reflect.Float64 || k == reflect.Uint ||
+		k == reflect.Uint16 || k == reflect.Uint32 || k == reflect.Uint64 ||
+		k == reflect.Uint8 || k == reflect.Func {
+		return a
 	}
-	return string(a.(string))
+	if a == nil || reflect.ValueOf(a).Len() < 1 {
+		return ""
+	}
+	return a
 }
 
 func asJSON(s interface{}) string {

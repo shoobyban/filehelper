@@ -96,6 +96,65 @@ func TestParseStruct(t *testing.T) {
 				},
 			},
 		},
+		"_items": testParserStruct{
+			Input:  "ordn_1\nsmtg_2\norln_a_3\n",
+			Format: "bfk",
+			Result: map[string]interface{}{
+				"ordn": "1",
+				"smtg": "2",
+				"orln": [][]string{
+					[]string{"a", "3"},
+				},
+			},
+			Reg: map[string]ParserFunc{
+				"bfk": func(content []byte) (interface{}, error) {
+					ret := map[string]interface{}{}
+					lines := strings.Split(string(content), "\n")
+					forceslice := []string{"orln"}
+					for _, line := range lines {
+						items := strings.Split(strings.Trim(line, "\r"), "_")
+						if items[0] == "" {
+							continue
+						}
+						if len(forceslice) > 0 {
+							for _, a := range forceslice {
+								if a == items[0] {
+									if _, ok := ret[items[0]]; !ok {
+										ret[items[0]] = [][]string{}
+									}
+								}
+							}
+						}
+						if v, ok := ret[items[0]]; ok {
+							if reflect.ValueOf(v).Kind() == reflect.Slice {
+								if len(v.([][]string)) == 0 {
+									ret[items[0]] = append(v.([][]string), items[1:])
+								} else if reflect.ValueOf(v).Index(0).Kind() == reflect.Slice {
+									ret[items[0]] = append(ret[items[0]].([][]string), items[1:])
+								} else {
+									ret[items[0]] = append([][]string{}, ret[items[0]].([]string), items[1:])
+								}
+							} else if reflect.ValueOf(v).Kind() == reflect.String {
+								ret[items[0]] = append([]interface{}{}, ret[items[0]], items[1:])
+							} else if v == nil {
+								ret[items[0]] = append([]interface{}{}, ret[items[0]], items[1:])
+							} else {
+								return nil, fmt.Errorf("Unhandled %#v", v)
+							}
+						} else {
+							if len(items) > 2 {
+								ret[items[0]] = items[1:]
+							} else if len(items) == 2 {
+								ret[items[0]] = items[1]
+							} else {
+								ret[items[0]] = nil
+							}
+						}
+					}
+					return ret, nil
+				},
+			},
+		},
 	}
 	for name, test := range tests {
 		l := NewParser()
