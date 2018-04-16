@@ -21,6 +21,17 @@ func TestTemplate(t *testing.T) {
 			Template: `Pi: '{{ "0.812545" | decimal "6,6" }}'`,
 			Result:   "Pi: '0.812545'",
 		},
+		"decimal0": testTemplateStruct{
+			Template: `Pi: '{{ "0.1" | decimal "0,1" }}'`,
+			Result:   "Pi: '0.1'",
+		},
+		"decimal1": testTemplateStruct{
+			Template: `Pi: '{{ decimal "0,6" .test1 }}'`,
+			Values: map[string]interface{}{
+				"test1": nil,
+			},
+			Result: "Pi: '0.0'",
+		},
 		"fixlen": testTemplateStruct{
 			Template: `Fix: '{{ "A" | fixlen 5 }}'`,
 			Result:   "Fix: 'A    '",

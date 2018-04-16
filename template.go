@@ -47,10 +47,18 @@ func dateFmt(format, datestring string) string {
 	return t.Format(format)
 }
 
-func decimalFmt(format, num string) string {
+func decimalFmt(format string, number interface{}) string {
+	num := emptyStr(number)
 	f, _ := strconv.ParseFloat(num, 64)
 	i := strings.Split(format, ",")
-	return fmt.Sprintf(fmt.Sprintf("%%%s.%sf", i[0], i[1]), f)
+	s := fmt.Sprintf(fmt.Sprintf("%%%s.%sf", i[0], i[1]), f)
+	if i[1] != "0" {
+		s = strings.TrimRight(s, "0")
+		if s[len(s)-1:] == "." {
+			s += "0"
+		}
+	}
+	return s
 }
 
 func formatUKDate(datestring string) string {
@@ -127,6 +135,21 @@ func empty(a interface{}) interface{} {
 		return ""
 	}
 	return a
+}
+
+func emptyStr(a interface{}) string {
+	k := reflect.ValueOf(a).Kind()
+	if k == reflect.Int || k == reflect.Int16 || k == reflect.Int32 ||
+		k == reflect.Int64 || k == reflect.Int8 || k == reflect.Bool ||
+		k == reflect.Float32 || k == reflect.Float64 || k == reflect.Uint ||
+		k == reflect.Uint16 || k == reflect.Uint32 || k == reflect.Uint64 ||
+		k == reflect.Uint8 || k == reflect.Func {
+		return fmt.Sprintf("%v", a)
+	}
+	if a == nil || reflect.ValueOf(a).Len() < 1 {
+		return ""
+	}
+	return fmt.Sprintf("%v", a)
 }
 
 func asJSON(s interface{}) string {
