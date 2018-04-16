@@ -18,19 +18,12 @@ func TestTemplate(t *testing.T) {
 			Result: " OK Not OK Maybe",
 		},
 		"decimal": testTemplateStruct{
-			Template: `Pi: '{{ "0.812545" | decimal "6,6" }}'`,
-			Result:   "Pi: '0.812545'",
-		},
-		"decimal0": testTemplateStruct{
-			Template: `Pi: '{{ "0.1" | decimal "0,1" }}'`,
-			Result:   "Pi: '0.1'",
-		},
-		"decimal1": testTemplateStruct{
-			Template: `Pi: '{{ decimal "0,6" .test1 }}'`,
+			Template: `All: '{{ "0.812545" | decimal "6,6" }}, {{ "0.1" | decimal "0,1" }}, {{ decimal "0,6" .test1 }}, {{ decimal "0,6" .test2 }}, {{ decimal "0,0" .test2 }}'`,
 			Values: map[string]interface{}{
 				"test1": nil,
+				"test2": 10010.2342342342,
 			},
-			Result: "Pi: '0.0'",
+			Result: "All: '0.812545, 0.1, 0.0, 10010.234234, 10010'",
 		},
 		"fixlen": testTemplateStruct{
 			Template: `Fix: '{{ "A" | fixlen 5 }}'`,
