@@ -62,6 +62,54 @@ func TestTemplate(t *testing.T) {
 			},
 			Result: `1234567890||3|[1 2 3]||`,
 		},
+		"filter": testTemplateStruct{
+			Template: `{{ $c := filter .countries "data.[iso=GB]" }}{{ $c.name }}`,
+			Values: map[string]interface{}{
+				"countries": map[string]interface{}{
+					"data": []interface{}{
+						map[string]interface{}{
+							"iso":  "GB",
+							"name": "Great Britain",
+						},
+						map[string]interface{}{
+							"iso":  "US",
+							"name": "United States",
+						},
+					},
+				},
+			},
+			Result: `Great Britain`,
+		},
+		"deepfilter": testTemplateStruct{
+			Template: `{{ $c := filter .countries "data.[iso=GB]" }}{{ $r := filter $c "states.[name=Surrey]" }}{{ $r.id }}`,
+			Values: map[string]interface{}{
+				"countries": map[string]interface{}{
+					"data": []interface{}{
+						map[string]interface{}{
+							"iso":  "GB",
+							"name": "Great Britain",
+							"states": []interface{}{
+								map[string]interface{}{
+									"id":   1,
+									"name": "Surrey",
+								},
+							},
+						},
+						map[string]interface{}{
+							"iso":  "US",
+							"name": "United States",
+							"states": []interface{}{
+								map[string]interface{}{
+									"id":   2,
+									"name": "Alabama",
+								},
+							},
+						},
+					},
+				},
+			},
+			Result: `1`,
+		},
 	}
 	for name, test := range tests {
 		res, err := Template(test.Template, test.Values)
