@@ -131,8 +131,33 @@ func empty(a interface{}) interface{} {
 		k == reflect.Uint8 || k == reflect.Func {
 		return a
 	}
-	if a == nil || reflect.ValueOf(a).Len() < 1 {
+	v := reflect.ValueOf(a)
+	if a == nil ||
+		(k == reflect.Slice && v.Len() < 1) ||
+		(k == reflect.Struct && v.NumField() < 1) ||
+		(k == reflect.Map && v.Len() < 1) {
 		return ""
+	}
+	if k == reflect.Struct {
+		p := fmt.Sprintf("%#v", a)
+		if p == "[]interface {}{}" || p == "map[string]interface {}{}" {
+			return ""
+		}
+	}
+	if k == reflect.Slice {
+		for i := 0; i < v.Len(); i++ {
+			if empty(v.Index(i)) != "" {
+				return a
+			}
+		}
+		return ""
+	}
+	if k == reflect.Map {
+		for _, mk := range v.MapKeys() {
+			if empty(v.MapIndex(mk)) != "" {
+				return a
+			}
+		}
 	}
 	return a
 }
@@ -197,7 +222,7 @@ func mapto(item, mapvals, separators string) string {
 	if ret, ok := mapping[item]; ok {
 		return ret
 	}
-	return ""
+	return item
 }
 
 // add returns the sum of a and b.

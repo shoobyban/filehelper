@@ -54,13 +54,13 @@ func TestTemplate(t *testing.T) {
 			Result:   `123|1234|12`,
 		},
 		"empty": testTemplateStruct{
-			Template: `{{ "1234567890" | empty }}|{{ "" | empty }}|{{ 3 | empty }}|{{.test1|empty}}|{{.test2|empty}}|{{.test3|empty}}`,
+			Template: `{{ "1234567890" | empty }}|{{ "" | empty }}|{{ 3 | empty }}|{{.test1|empty}}|{{ $c := .test2|empty }}{{ concat "x" $c "y" }}|{{ $d := .test3|empty }}{{ concat "x" $d "y" }}`,
 			Values: map[string]interface{}{
 				"test1": []string{"1", "2", "3"},
-				"test2": []interface{}{},
-				"test3": map[string]interface{}{},
+				"test2": map[string]interface{}{},
+				"test3": []interface{}{[]interface{}{}},
 			},
-			Result: `1234567890||3|[1 2 3]||`,
+			Result: `1234567890||3|[1 2 3]|xy|xy`,
 		},
 		"filter": testTemplateStruct{
 			Template: `{{ $c := filter .countries "data.[iso=GB]" }}{{ $c.name }}`,
