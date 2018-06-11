@@ -97,15 +97,9 @@ func TestParseStruct(t *testing.T) {
 			},
 		},
 		"_items": testParserStruct{
-			Input:  "ordn_1\nsmtg_2\norln_a_3\n",
+			Input:  "##fn_2018042711432473\r\ntype_order_ack\r\nordn_20023\r\norln_115_73_1\r\n$$$$\r\n",
 			Format: "bfk",
-			Result: map[string]interface{}{
-				"ordn": "1",
-				"smtg": "2",
-				"orln": [][]string{
-					[]string{"a", "3"},
-				},
-			},
+			Result: map[string]interface{}{"ordn": "20023", "orln": [][]string{[]string{"115", "73", "1"}}, "$$$$": interface{}(nil), "##fn": "2018042711432473", "type": []string{"order", "ack"}},
 			Reg: map[string]ParserFunc{
 				"bfk": func(content []byte) (interface{}, error) {
 					ret := map[string]interface{}{}
