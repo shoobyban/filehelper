@@ -25,6 +25,15 @@ func TestTemplate(t *testing.T) {
 			},
 			Result: "All: '0.812545, 0.1, 0.0, 10010.234234, 10010'",
 		},
+		"dec": testTemplateStruct{
+			Template: `Dec: {{ "3" | int | sub 1 }}`,
+			Result:   "Dec: 2",
+		},
+		"decrange": testTemplateStruct{
+			Template: `Dec: {{$t := var "a"}}{{ range $i, $v := .nums }}{{$t.Value}}{{ $t.Set ($v | int | sub 1) }}{{end}}`,
+			Values:   map[string]interface{}{"nums": []string{"5", "3", "1"}},
+			Result:   "Dec: 2",
+		},
 		"fixlen": testTemplateStruct{
 			Template: `Fix: '{{ "A" | fixlen 5 }}'`,
 			Result:   "Fix: 'A    '",
