@@ -30,9 +30,9 @@ func TestTemplate(t *testing.T) {
 			Result:   "Dec: 2",
 		},
 		"decrange": testTemplateStruct{
-			Template: `Dec: {{$t := var "a"}}{{ range $i, $v := .nums }}{{$t.Value}}{{ $t.Set ($v | int | sub 1) }}{{end}}`,
+			Template: `Dec: {{$t := var "H2G2_"}}{{ range $i, $v := .nums }}{{$t.Value}}{{ $t.Set ($v | int | sub 1) }}{{end}}`,
 			Values:   map[string]interface{}{"nums": []string{"5", "3", "1"}},
-			Result:   "Dec: 2",
+			Result:   "Dec: H2G2_42",
 		},
 		"fixlen": testTemplateStruct{
 			Template: `Fix: '{{ "A" | fixlen 5 }}'`,
