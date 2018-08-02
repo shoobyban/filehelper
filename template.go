@@ -125,6 +125,14 @@ func timestamp() string {
 	return time.Now().String()
 }
 
+func unixtimestamp() int32 {
+	return int32(time.Now().Unix())
+}
+
+func nanotimestamp() int64 {
+	return int64(time.Now().UnixNano())
+}
+
 func empty(a interface{}) interface{} {
 	k := reflect.ValueOf(a).Kind()
 	if k == reflect.Int || k == reflect.Int16 || k == reflect.Int32 ||
@@ -410,37 +418,39 @@ func divide(b, a interface{}) (interface{}, error) {
 // Template parses string as Go template, using data as scope
 func Template(str string, data interface{}) (string, error) {
 	fmap := template.FuncMap{
-		"formatUKDate": formatUKDate,
-		"limit":        limit,
-		"fixlen":       fixlen,
-		"fixlenr":      fixlenright,
-		"sanitise":     sanitise,
-		"sanitize":     sanitise,
-		"last":         last,
-		"reReplaceAll": reReplaceAll,
-		"match":        regexp.MatchString,
-		"title":        strings.Title,
-		"timestamp":    timestamp,
-		"json":         asJSON,
-		"toUpper":      strings.ToUpper,
-		"upper":        strings.ToUpper,
-		"toLower":      strings.ToLower,
-		"lower":        strings.ToLower,
-		"filter":       filterPath,
-		"concat":       concat,         // concat "a" "b" => "ab"
-		"empty":        empty,          // empty [] => "", ["bah"] => "bah"
-		"int":          toint,          // int "0123" => 123
-		"ifthen":       conditional,    // ifthen "a" "b" => a, ifthen "" "b" => b
-		"elseifthen":   notconditional, // elseifthen "a" "b" => b, elseifthen "" "b" => ""
-		"mapto":        mapto,          // mapto "a" "a:True|b:False" "|:" => True
-		"date":         dateFmt,        // "2017-03-31 19:59:11" |  date "06.01.02" => "17.03.31"
-		"decimal":      decimalFmt,     // 3.1415 decimal 6,2 => 3.14
-		"item":         item,           // item "a:b" ":" 0 => a
-		"add":          add,
-		"sub":          subtract,
-		"div":          divide,
-		"mul":          multiply,
-		"var":          newVariable,
+		"formatUKDate":  formatUKDate,
+		"limit":         limit,
+		"fixlen":        fixlen,
+		"fixlenr":       fixlenright,
+		"sanitise":      sanitise,
+		"sanitize":      sanitise,
+		"last":          last,
+		"reReplaceAll":  reReplaceAll,
+		"match":         regexp.MatchString,
+		"title":         strings.Title,
+		"timestamp":     timestamp,
+		"unixtimestamp": timestamp,
+		"nanotimestamp": nanotimestamp,
+		"json":          asJSON,
+		"toUpper":       strings.ToUpper,
+		"upper":         strings.ToUpper,
+		"toLower":       strings.ToLower,
+		"lower":         strings.ToLower,
+		"filter":        filterPath,
+		"concat":        concat,         // concat "a" "b" => "ab"
+		"empty":         empty,          // empty [] => "", ["bah"] => "bah"
+		"int":           toint,          // int "0123" => 123
+		"ifthen":        conditional,    // ifthen "a" "b" => a, ifthen "" "b" => b
+		"elseifthen":    notconditional, // elseifthen "a" "b" => b, elseifthen "" "b" => ""
+		"mapto":         mapto,          // mapto "a" "a:True|b:False" "|:" => True
+		"date":          dateFmt,        // "2017-03-31 19:59:11" |  date "06.01.02" => "17.03.31"
+		"decimal":       decimalFmt,     // 3.1415 decimal 6,2 => 3.14
+		"item":          item,           // item "a:b" ":" 0 => a
+		"add":           add,
+		"sub":           subtract,
+		"div":           divide,
+		"mul":           multiply,
+		"var":           newVariable,
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
