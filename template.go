@@ -125,6 +125,18 @@ func timestamp() string {
 	return time.Now().String()
 }
 
+func datetime() string {
+	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+func ukdate() string {
+	return time.Now().Format("02/01/06")
+}
+
+func ukdatetime() string {
+	return time.Now().Format("02/01/06 15:04:05")
+}
+
 func unixtimestamp() int32 {
 	return int32(time.Now().Unix())
 }
@@ -415,6 +427,31 @@ func divide(b, a interface{}) (interface{}, error) {
 	}
 }
 
+func explode(s, sep string) []string {
+	return strings.Split(s, sep)
+}
+
+func inArray(needle interface{}, haystack interface{}) bool {
+	switch reflect.TypeOf(haystack).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(haystack)
+
+		for i := 0; i < s.Len(); i++ {
+			if reflect.DeepEqual(needle, s.Index(i).Interface()) == true {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// MustTemplate parses string as Go template, using data as scope
+func MustTemplate(str string, data interface{}) string {
+	ret, _ := Template(str, data)
+	return ret
+}
+
 // Template parses string as Go template, using data as scope
 func Template(str string, data interface{}) (string, error) {
 	fmap := template.FuncMap{
@@ -429,6 +466,9 @@ func Template(str string, data interface{}) (string, error) {
 		"match":         regexp.MatchString,
 		"title":         strings.Title,
 		"timestamp":     timestamp,
+		"datetime":      datetime,
+		"ukdatetime":    ukdatetime,
+		"ukdate":        ukdate,
 		"unixtimestamp": timestamp,
 		"nanotimestamp": nanotimestamp,
 		"json":          asJSON,
@@ -451,6 +491,8 @@ func Template(str string, data interface{}) (string, error) {
 		"div":           divide,
 		"mul":           multiply,
 		"var":           newVariable,
+		"explode":       explode,
+		"in_array":      inArray,
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
@@ -479,17 +521,14 @@ func ProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
 }
 
 // MustProcessTemplateFile processes golang template file
-func MustProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
+func MustProcessTemplateFile(template string, bundle interface{}) string {
 	tf, err := os.Open(template)
 	if err != nil {
-		return nil, err
+		return ""
 	}
 	byteValue, _ := ioutil.ReadAll(tf)
-	output, err := Template(string(byteValue), bundle)
-	if err != nil {
-		return []byte{}, err
-	}
-	return []byte(output), nil
+	output, _ := Template(string(byteValue), bundle)
+	return output
 }
 
 // // JSTemplate parses JS code as template, using data as scope

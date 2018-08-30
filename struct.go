@@ -2,13 +2,13 @@ package filehelper
 
 import (
 	"bytes"
-	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 
+	"github.com/recursionpharma/go-csv-map"
 	"github.com/shoobyban/mxj"
 	"github.com/shoobyban/slog"
 )
@@ -32,7 +32,12 @@ func NewParser() *Parser {
 				return out, err
 			},
 			"csv": func(content []byte) (interface{}, error) {
-				r := csv.NewReader(bytes.NewBuffer(content))
+				r := csvmap.NewReader(bytes.NewBuffer(content))
+				var err error
+				r.Columns, err = r.ReadHeader()
+				if err != nil {
+					slog.Errorf("Error reading csv header %v", err)
+				}
 				return r.ReadAll()
 			},
 		},

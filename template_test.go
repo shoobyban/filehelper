@@ -10,6 +10,14 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"explode": testTemplateStruct{
+			Template: `{{explode "1|2|3" "|"}}`,
+			Result:   "[1 2 3]",
+		},
+		"in_array": testTemplateStruct{
+			Template: `{{in_array "1" (explode "1|2|3" "|")}}`,
+			Result:   "true",
+		},
 		"mapto": testTemplateStruct{
 			Template: `{{range $key, $item := .test1}} {{ mapto $item "1:OK|2:Not OK|3:Maybe" "|:" }}{{end}}`,
 			Values: map[string]interface{}{
