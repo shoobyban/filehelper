@@ -33,7 +33,7 @@ func TestParseStruct(t *testing.T) {
 		"csv": testParserStruct{
 			Input:  "A,B\nC,D\n",
 			Format: "csv",
-			Result: [][]string{[]string{"A", "B"}, []string{"C", "D"}},
+			Result: []map[string]string{map[string]string{"A": "C", "B": "D"}},
 		},
 		"underscore": testParserStruct{
 			Input:  "A_B\nC_D\n",
