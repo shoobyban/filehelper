@@ -25,6 +25,13 @@ func TestTemplate(t *testing.T) {
 			},
 			Result: " OK Not OK Maybe",
 		},
+		"tojson": testTemplateStruct{
+			Template: `{{(tojson .val).analysis_code_15}}`,
+			Values: map[string]interface{}{
+				"val": `{"analysis_code_15":"Carneval \"Cool\" Point"}`,
+			},
+			Result: `Carneval "Cool" Point`,
+		},
 		"decimal": testTemplateStruct{
 			Template: `All: '{{ "0.812545" | decimal "6,6" }}, {{ "0.1" | decimal "0,1" }}, {{ decimal "0,6" .test1 }}, {{ decimal "0,6" .test2 }}, {{ decimal "0,0" .test2 }}'`,
 			Values: map[string]interface{}{

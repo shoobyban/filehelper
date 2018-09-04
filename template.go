@@ -446,6 +446,15 @@ func inArray(needle interface{}, haystack interface{}) bool {
 	return false
 }
 
+func tojson(s string) (interface{}, error) {
+	p := NewParser()
+	res, err := p.ParseStruct([]byte(s), "json")
+	if err != nil {
+		return nil, fmt.Errorf("Unable to parse json '%s': %v", s, err)
+	}
+	return res, nil
+}
+
 // MustTemplate parses string as Go template, using data as scope
 func MustTemplate(str string, data interface{}) string {
 	ret, _ := Template(str, data)
@@ -492,6 +501,7 @@ func Template(str string, data interface{}) (string, error) {
 		"mul":           multiply,
 		"var":           newVariable,
 		"explode":       explode,
+		"tojson":        tojson,
 		"in_array":      inArray,
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
