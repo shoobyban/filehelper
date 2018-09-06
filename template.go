@@ -221,6 +221,10 @@ func toint(s string) int {
 	return i
 }
 
+func tofloat(s string) (float64, error) {
+	return strconv.ParseFloat(s, 64)
+}
+
 func conditional(s1, s2 string) string {
 	if s1 != "" {
 		return s1
@@ -489,6 +493,7 @@ func Template(str string, data interface{}) (string, error) {
 		"concat":        concat,         // concat "a" "b" => "ab"
 		"empty":         empty,          // empty [] => "", ["bah"] => "bah"
 		"int":           toint,          // int "0123" => 123
+		"float":         tofloat,        // float "0123.234" => 123.234
 		"ifthen":        conditional,    // ifthen "a" "b" => a, ifthen "" "b" => b
 		"elseifthen":    notconditional, // elseifthen "a" "b" => b, elseifthen "" "b" => ""
 		"mapto":         mapto,          // mapto "a" "a:True|b:False" "|:" => True

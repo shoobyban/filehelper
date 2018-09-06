@@ -32,6 +32,15 @@ func TestTemplate(t *testing.T) {
 			},
 			Result: `Carneval "Cool" Point`,
 		},
+		"divdec": testTemplateStruct{
+			Template: `{{$l := len .a}}Len: {{$l}}{{ $b := (div $l .b) }}{{ $a := (div $l .c) }} A+B={{ add $a $b | decimal "1,2" }}`,
+			Values: map[string]interface{}{
+				"a": []interface{}{1, 2, 3},
+				"b": 183.33,
+				"c": 149.61,
+			},
+			Result: `Len: 3 A+B=110.98`,
+		},
 		"decimal": testTemplateStruct{
 			Template: `All: '{{ "0.812545" | decimal "6,6" }}, {{ "0.1" | decimal "0,1" }}, {{ decimal "0,6" .test1 }}, {{ decimal "0,6" .test2 }}, {{ decimal "0,0" .test2 }}'`,
 			Values: map[string]interface{}{
