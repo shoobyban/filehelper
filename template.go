@@ -137,6 +137,10 @@ func ukdatetime() string {
 	return time.Now().Format("02/01/06 15:04:05")
 }
 
+func timeFormat(format string) string {
+	return time.Now().Format(format)
+}
+
 func unixtimestamp() int32 {
 	return int32(time.Now().Unix())
 }
