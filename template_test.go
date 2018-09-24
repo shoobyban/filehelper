@@ -1,6 +1,9 @@
 package filehelper
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 type testTemplateStruct struct {
 	Template string
@@ -10,6 +13,10 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"timeformat": testTemplateStruct{
+			Template: `{{timeformat "020106"}}`,
+			Result:   time.Now().Format("020106"),
+		},
 		"explode": testTemplateStruct{
 			Template: `{{explode "1|2|3" "|"}}`,
 			Result:   "[1 2 3]",

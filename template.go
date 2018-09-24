@@ -512,6 +512,7 @@ func Template(str string, data interface{}) (string, error) {
 		"explode":       explode,
 		"tojson":        tojson,
 		"in_array":      inArray,
+		"timeformat":    timeFormat,
 	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
