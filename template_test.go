@@ -13,10 +13,6 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
-		"t": testTemplateStruct{
-			Template: `{{range $i := [1,2,3]}}{{$i}}{{end}}`,
-			Result:   "123",
-		},
 		"timeformat": testTemplateStruct{
 			Template: `{{timeformat "020106"}}`,
 			Result:   time.Now().Format("020106"),
