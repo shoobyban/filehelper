@@ -2,7 +2,6 @@ package filehelper
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -25,11 +24,11 @@ type Parser struct {
 func NewParser() *Parser {
 	return &Parser{
 		parsers: map[string]ParserFunc{
-			"xml": func(content []byte) (interface{}, error) { return mxj.NewMapXml(content) },
+			"xml": func(content []byte) (interface{}, error) {
+				return mxj.NewMapXml(content)
+			},
 			"json": func(content []byte) (interface{}, error) {
-				var out interface{}
-				err := json.Unmarshal(content, &out)
-				return out, err
+				return mxj.NewMapJson(content)
 			},
 			"csv": func(content []byte) (interface{}, error) {
 				r := csvmap.NewReader(bytes.NewBuffer(content))

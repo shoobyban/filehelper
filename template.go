@@ -17,6 +17,50 @@ import (
 	//	"github.com/robertkrimen/otto"
 )
 
+var fmap = template.FuncMap{
+	"formatUKDate":  formatUKDate,
+	"limit":         limit,
+	"fixlen":        fixlen,
+	"fixlenr":       fixlenright,
+	"sanitise":      sanitise,
+	"sanitize":      sanitise,
+	"last":          last,
+	"reReplaceAll":  reReplaceAll,
+	"match":         regexp.MatchString,
+	"title":         strings.Title,
+	"timestamp":     timestamp,
+	"datetime":      datetime,
+	"ukdatetime":    ukdatetime,
+	"ukdate":        ukdate,
+	"unixtimestamp": timestamp,
+	"nanotimestamp": nanotimestamp,
+	"json":          asJSON,
+	"toUpper":       strings.ToUpper,
+	"upper":         strings.ToUpper,
+	"toLower":       strings.ToLower,
+	"lower":         strings.ToLower,
+	"filter":        filterPath,
+	"concat":        concat,         // concat "a" "b" => "ab"
+	"empty":         empty,          // empty [] => "", ["bah"] => "bah"
+	"int":           toint,          // int "0123" => 123
+	"float":         tofloat,        // float "0123.234" => 123.234
+	"ifthen":        conditional,    // ifthen "a" "b" => a, ifthen "" "b" => b
+	"elseifthen":    notconditional, // elseifthen "a" "b" => b, elseifthen "" "b" => ""
+	"mapto":         mapto,          // mapto "a" "a:True|b:False" "|:" => True
+	"date":          dateFmt,        // "2017-03-31 19:59:11" |  date "06.01.02" => "17.03.31"
+	"decimal":       decimalFmt,     // 3.1415 decimal 6,2 => 3.14
+	"item":          item,           // item "a:b" ":" 0 => a
+	"add":           add,
+	"sub":           subtract,
+	"div":           divide,
+	"mul":           multiply,
+	"var":           newVariable,
+	"explode":       explode,
+	"tojson":        tojson,
+	"in_array":      inArray,
+	"timeformat":    timeFormat,
+}
+
 type variable struct {
 	Value interface{}
 }
@@ -469,51 +513,22 @@ func MustTemplate(str string, data interface{}) string {
 	return ret
 }
 
+// TemplateDelim parses string with custom delimiters as Go template, using data as scope
+func TemplateDelim(str string, data interface{}, begin, end string) (string, error) {
+	tmpl, err := template.New("test").Funcs(fmap).Delims(begin, end).Parse(str)
+	if err == nil {
+		var doc bytes.Buffer
+		err = tmpl.Execute(&doc, data)
+		if err != nil {
+			return "", err
+		}
+		return strings.Replace(doc.String(), "<no value>", "", -1), nil
+	}
+	return "", err
+}
+
 // Template parses string as Go template, using data as scope
 func Template(str string, data interface{}) (string, error) {
-	fmap := template.FuncMap{
-		"formatUKDate":  formatUKDate,
-		"limit":         limit,
-		"fixlen":        fixlen,
-		"fixlenr":       fixlenright,
-		"sanitise":      sanitise,
-		"sanitize":      sanitise,
-		"last":          last,
-		"reReplaceAll":  reReplaceAll,
-		"match":         regexp.MatchString,
-		"title":         strings.Title,
-		"timestamp":     timestamp,
-		"datetime":      datetime,
-		"ukdatetime":    ukdatetime,
-		"ukdate":        ukdate,
-		"unixtimestamp": timestamp,
-		"nanotimestamp": nanotimestamp,
-		"json":          asJSON,
-		"toUpper":       strings.ToUpper,
-		"upper":         strings.ToUpper,
-		"toLower":       strings.ToLower,
-		"lower":         strings.ToLower,
-		"filter":        filterPath,
-		"concat":        concat,         // concat "a" "b" => "ab"
-		"empty":         empty,          // empty [] => "", ["bah"] => "bah"
-		"int":           toint,          // int "0123" => 123
-		"float":         tofloat,        // float "0123.234" => 123.234
-		"ifthen":        conditional,    // ifthen "a" "b" => a, ifthen "" "b" => b
-		"elseifthen":    notconditional, // elseifthen "a" "b" => b, elseifthen "" "b" => ""
-		"mapto":         mapto,          // mapto "a" "a:True|b:False" "|:" => True
-		"date":          dateFmt,        // "2017-03-31 19:59:11" |  date "06.01.02" => "17.03.31"
-		"decimal":       decimalFmt,     // 3.1415 decimal 6,2 => 3.14
-		"item":          item,           // item "a:b" ":" 0 => a
-		"add":           add,
-		"sub":           subtract,
-		"div":           divide,
-		"mul":           multiply,
-		"var":           newVariable,
-		"explode":       explode,
-		"tojson":        tojson,
-		"in_array":      inArray,
-		"timeformat":    timeFormat,
-	}
 	tmpl, err := template.New("test").Funcs(fmap).Parse(str)
 	if err == nil {
 		var doc bytes.Buffer
