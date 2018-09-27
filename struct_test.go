@@ -28,7 +28,7 @@ func TestParseStruct(t *testing.T) {
 		"json": testParserStruct{
 			Input:  `{"a":["b","c"]}`,
 			Format: "json",
-			Result: map[string]interface{}{"a": []interface{}{"b", "c"}},
+			Result: mxj.Map{"a": []interface{}{"b", "c"}},
 		},
 		"csv": testParserStruct{
 			Input:  "A,B\nC,D\n",
