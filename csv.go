@@ -9,11 +9,21 @@ import (
 	"reflect"
 )
 
-// WriteCSV writes headers and rows into a given file handle
+// WriteCSV writes headers and rows into a given file handle and reads it back as []byte
 func WriteCSV(file io.ReadWriter, columns []string, rows []map[string]interface{}) ([]byte, error) {
+	err := OnlyWriteCSV(file, columns, rows)
+	if err != nil {
+		return []byte{}, err
+	}
+	byteValue, _ := ioutil.ReadAll(file)
+	return byteValue, nil
+}
+
+// OnlyWriteCSV writes headers and rows into a given file handle
+func OnlyWriteCSV(file io.Writer, columns []string, rows []map[string]interface{}) error {
 	w := csv.NewWriter(file)
 	if err := w.Write(columns); err != nil {
-		return nil, err
+		return err
 	}
 	r := make([]string, len(columns))
 	var ok bool
@@ -21,16 +31,15 @@ func WriteCSV(file io.ReadWriter, columns []string, rows []map[string]interface{
 		for i, column := range columns {
 			if r[i], ok = row[column].(string); !ok {
 				message := fmt.Sprintf("type is %T in cell for value %v", row[column], row[column])
-				return nil, errors.New(message)
+				return fmt.Errorf(message)
 			}
 		}
 		if err := w.Write(r); err != nil {
-			return nil, err
+			return err
 		}
 	}
 	w.Flush()
-	byteValue, _ := ioutil.ReadAll(file)
-	return byteValue, nil
+	return nil
 }
 
 // SplitKeys creates a map for CSV header
