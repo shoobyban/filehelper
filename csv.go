@@ -10,7 +10,7 @@ import (
 )
 
 // WriteCSV writes headers and rows into a given file handle
-func WriteCSV(file io.Writer, columns []string, rows []map[string]interface{}) ([]byte, error) {
+func WriteCSV(file io.ReadWriter, columns []string, rows []map[string]interface{}) ([]byte, error) {
 	w := csv.NewWriter(file)
 	if err := w.Write(columns); err != nil {
 		return nil, err
