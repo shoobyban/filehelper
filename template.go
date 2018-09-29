@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
+	"github.com/spf13/afero"
 	//	"github.com/robertkrimen/otto"
 )
 
@@ -60,6 +61,8 @@ var fmap = template.FuncMap{
 	"in_array":      inArray,
 	"timeformat":    timeFormat,
 }
+
+var fs afero.Fs
 
 type variable struct {
 	Value interface{}
@@ -541,13 +544,31 @@ func Template(str string, data interface{}) (string, error) {
 	return "", err
 }
 
+// RegisterFS (afero) virtual filesystem for ProcessTemplateFile
+func RegisterFS(filesystem afero.Fs) {
+	fs = filesystem
+}
+
 // ProcessTemplateFile processes golang template file
 func ProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
-	tf, err := os.Open(template)
+	var byteValue []byte
+	var err error
+	if fs == nil {
+		tf, err := os.Open(template)
+		if err != nil {
+			return nil, err
+		}
+		byteValue, err = ioutil.ReadAll(tf)
+	} else {
+		tf, err := fs.Open(template)
+		if err != nil {
+			return nil, err
+		}
+		byteValue, err = ioutil.ReadAll(tf)
+	}
 	if err != nil {
 		return nil, err
 	}
-	byteValue, _ := ioutil.ReadAll(tf)
 	output, err := Template(string(byteValue), bundle)
 	if err != nil {
 		return []byte{}, err
