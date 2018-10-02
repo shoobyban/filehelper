@@ -24,18 +24,20 @@ func WriteCSV(file *os.File, columns []string, rows []map[string]interface{}) ([
 	return byteValue, nil
 }
 
-// ReadCSV reads csv into []map[string]string
-func ReadCSV(filename string) ([]map[string]string, error) {
+// ReadCSV reads csv into []map[string]string + []string for headers
+func ReadCSV(filename string) ([]map[string]string, []string, error) {
 	csvFile, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	r := csvmap.NewReader(bufio.NewReader(csvFile))
 	r.Columns, err = r.ReadHeader()
 	if err != nil {
 		slog.Errorf("Error reading csv header %v", err)
+		return nil, nil, err
 	}
-	return r.ReadAll()
+	all, err := r.ReadAll()
+	return all, r.Columns, err
 }
 
 // OnlyWriteCSV writes headers and rows into a given file handle
