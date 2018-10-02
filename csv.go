@@ -1,12 +1,16 @@
 package filehelper
 
 import (
+	"bufio"
 	"encoding/csv"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
+
+	csvmap "github.com/recursionpharma/go-csv-map"
+	"github.com/shoobyban/slog"
 )
 
 // WriteCSV writes headers and rows into a given file handle and reads it back as []byte
@@ -18,6 +22,20 @@ func WriteCSV(file *os.File, columns []string, rows []map[string]interface{}) ([
 	}
 	byteValue, _ := ioutil.ReadAll(file)
 	return byteValue, nil
+}
+
+// ReadCSV reads csv into []map[string]string
+func ReadCSV(filename string) ([]map[string]string, error) {
+	csvFile, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	r := csvmap.NewReader(bufio.NewReader(csvFile))
+	r.Columns, err = r.ReadHeader()
+	if err != nil {
+		slog.Errorf("Error reading csv header %v", err)
+	}
+	return r.ReadAll()
 }
 
 // OnlyWriteCSV writes headers and rows into a given file handle
