@@ -273,6 +273,9 @@ func toint(s string) int {
 }
 
 func tofloat(s string) (float64, error) {
+	if s == "" {
+		s = "0.0"
+	}
 	return strconv.ParseFloat(s, 64)
 }
 
