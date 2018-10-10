@@ -13,6 +13,10 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"timeformatminus": testTemplateStruct{
+			Template: `{{timeformatminus "020106" 5 }}`,
+			Result:   time.Now().Add(time.Second * -5).Format("020106"),
+		},
 		"timeformat": testTemplateStruct{
 			Template: `{{timeformat "020106"}}`,
 			Result:   time.Now().Format("020106"),
