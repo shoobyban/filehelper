@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 
 	"github.com/shoobyban/slog"
 )
@@ -31,10 +32,14 @@ func WriteTar(datafile, filename string, buf []byte) {
 	tw := tar.NewWriter(f)
 
 	hdr := &tar.Header{
-		Name:     filename,
-		Typeflag: tar.TypeReg,
-		Mode:     0644,
-		Size:     int64(len(buf)),
+		Name:       filename,
+		Typeflag:   tar.TypeReg,
+		ModTime:    time.Now(),
+		AccessTime: time.Now(),
+		ChangeTime: time.Now(),
+		Mode:       0644,
+		Size:       int64(len(buf)),
+		Format:     tar.FormatGNU,
 	}
 	slog.Infof("Writing %s %d", filename, int64(len(buf)))
 	if err := tw.WriteHeader(hdr); err != nil {
