@@ -49,8 +49,9 @@ var fmap = template.FuncMap{
 	"elseifthen":      notconditional, // elseifthen "a" "b" => b, elseifthen "" "b" => ""
 	"mapto":           mapto,          // mapto "a" "a:True|b:False" "|:" => True
 	"date":            dateFmt,        // "2017-03-31 19:59:11" |  date "06.01.02" => "17.03.31"
-	"decimal":         decimalFmt,     // 3.1415 decimal 6,2 => 3.14
-	"item":            item,           // item "a:b" ":" 0 => a
+	"dateFrom":        dateFmtLayout,
+	"decimal":         decimalFmt, // 3.1415 decimal 6,2 => 3.14
+	"item":            item,       // item "a:b" ":" 0 => a
 	"add":             add,
 	"sub":             subtract,
 	"div":             divide,
@@ -97,6 +98,17 @@ func dateFmt(format, datestring string) string {
 		if err != nil {
 			return datestring
 		}
+	}
+	return t.Format(format)
+}
+
+func dateFmtLayout(format, datestring, layout string) string {
+	if format == "ukshort" {
+		format = "02/01/06"
+	}
+	t, err := time.Parse(layout, datestring)
+	if err != nil {
+		return err.Error()
 	}
 	return t.Format(format)
 }
