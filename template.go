@@ -94,7 +94,7 @@ func dateFmt(format, datestring string) string {
 	layout := "2006-01-02 15:04:05"
 	t, err := time.Parse(layout, datestring)
 	if err != nil {
-		t, err = time.Parse("2006-01-02T15:04:05+0700", datestring)
+		t, err = time.Parse("2006-01-02T15:04:05-0700", datestring)
 		if err != nil {
 			return datestring
 		}
