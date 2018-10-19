@@ -205,7 +205,7 @@ func timeFormat(format string) string {
 }
 
 func timeFormatMinus(format string, minus float64) string {
-	return time.Now().Add(time.Duration(minus) * time.Second).Format(format)
+	return time.Now().Add(time.Duration(minus) * -time.Second).Format(format)
 }
 
 func unixtimestamp() int32 {
