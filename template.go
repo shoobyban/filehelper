@@ -62,6 +62,10 @@ var fmap = template.FuncMap{
 	"in_array":        inArray,
 	"timeformat":      timeFormat,
 	"timeformatminus": timeFormatMinus,
+	"unique":          unique,
+	"setItem":         setItem,
+	"createMap":       createMap,
+	"mkSlice":         mkSlice,
 }
 
 var fs afero.Fs
@@ -77,6 +81,39 @@ func (v *variable) Set(value interface{}) string {
 
 func newVariable(initialValue interface{}) *variable {
 	return &variable{initialValue}
+}
+
+func createMap() map[string]interface{} {
+	return map[string]interface{}{}
+}
+
+func setItem(m map[string]interface{}, a string, b interface{}) map[string]interface{} {
+	m[a] = b
+	return m
+}
+
+func mkSlice(args ...interface{}) []interface{} {
+	return args
+}
+
+func unique(e []interface{}) []interface{} {
+	r := []interface{}{}
+
+	for _, s := range e {
+		if !inArray(s, r[:]) {
+			r = append(r, s)
+		}
+	}
+	return r
+}
+
+func contains(e []string, c string) bool {
+	for _, s := range e {
+		if s == c {
+			return true
+		}
+	}
+	return false
 }
 
 func item(s, sep string, num int) string {

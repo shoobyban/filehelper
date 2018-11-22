@@ -13,6 +13,22 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"map": testTemplateStruct{
+			Template: `{{ $m := createMap }}{{ $m := setItem $m "a" "b" }}{{ $m := setItem $m "c" "d" }}{{ range $i,$item := $m }} {{ $i }}:{{ $item }}{{ end }}`,
+			Result:   " a:b c:d",
+		},
+		"slice": testTemplateStruct{
+			Template: `{{ $slice := mkSlice "a" "b" "c" }}{{ range $slice }}{{.}}{{ end }}`,
+			Result:   "abc",
+		},
+		"unique": testTemplateStruct{
+			Template: `{{ $slice := mkSlice "a" "a" "b" "b" "c" }}{{ range (unique $slice) }}{{.}}{{ end }}`,
+			Result:   "abc",
+		},
+		"reReplaceAll": testTemplateStruct{
+			Template: `{{reReplaceAll "cd" "1" "abcdef" }}`,
+			Result:   "ab1ef",
+		},
 		"timeformatminus": testTemplateStruct{
 			Template: `{{timeformatminus "02/01/06 15:04:05" 5 }}`,
 			Result:   time.Now().Add(time.Second * -5).Format("02/01/06 15:04:05"),
