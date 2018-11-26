@@ -66,6 +66,7 @@ var fmap = template.FuncMap{
 	"setItem":         setItem,
 	"createMap":       createMap,
 	"mkSlice":         mkSlice,
+	"escape":          escape,
 }
 
 var fs afero.Fs
@@ -122,6 +123,10 @@ func item(s, sep string, num int) string {
 		return ""
 	}
 	return i[num]
+}
+
+func escape(str string) string {
+	return strings.Replace(str, "\"", "\\\"", -1)
 }
 
 func dateFmt(format, datestring string) string {
