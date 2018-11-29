@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
+	"github.com/shoobyban/mxj"
 	"github.com/spf13/afero"
 	//	"github.com/robertkrimen/otto"
 )
@@ -58,7 +59,11 @@ var fmap = template.FuncMap{
 	"mul":             multiply,
 	"var":             newVariable,
 	"explode":         explode,
-	"tojson":          tojson,
+	"tojson":          jsonDecode, // backward compatibility
+	"json_decode":     jsonDecode,
+	"json_encode":     jsonEncode,
+	"xml_decode":      xmlDecode,
+	"xml_encode":      xmlEncode,
 	"in_array":        inArray,
 	"timeformat":      timeFormat,
 	"timeformatminus": timeFormatMinus,
@@ -566,13 +571,32 @@ func inArray(needle interface{}, haystack interface{}) bool {
 	return false
 }
 
-func tojson(s string) (interface{}, error) {
+func jsonEncode(v interface{}) (string, error) {
+	b, err := json.Marshal(v)
+	return string(b), err
+}
+
+func xmlEncode(v interface{}) (string, error) {
+	mv := mxj.Map(v.(map[string]interface{}))
+	b, err := mv.Xml()
+	return string(b), err
+}
+
+func decode(s, format string) (interface{}, error) {
 	p := NewParser()
-	res, err := p.ParseStruct([]byte(s), "json")
+	res, err := p.ParseStruct([]byte(s), format)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to parse json '%s': %v", s, err)
 	}
 	return res, nil
+}
+
+func jsonDecode(s string) (interface{}, error) {
+	return decode(s, "json")
+}
+
+func xmlDecode(s string) (interface{}, error) {
+	return decode(s, "xml")
 }
 
 // MustTemplate parses string as Go template, using data as scope

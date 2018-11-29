@@ -52,12 +52,33 @@ func TestTemplate(t *testing.T) {
 			},
 			Result: " OK Not OK Maybe",
 		},
-		"tojson": testTemplateStruct{
-			Template: `{{(tojson .val).analysis_code_15}}`,
+		"xmldecode": testTemplateStruct{
+			Template: `{{(xml_decode .val).analysis_code_15}}`,
+			Values: map[string]interface{}{
+				"val": `<?xml version=\"1.0\"?><analysis_code_15>Carneval "Cool" Point</analysis_code_15>`,
+			},
+			Result: `Carneval "Cool" Point`,
+		},
+		"xmlencode": testTemplateStruct{
+			Template: `{{xml_encode .}}`,
+			Values: map[string]interface{}{
+				"analysis_code_15": "Carneval \"Cool\" Point",
+			},
+			Result: `<analysis_code_15>Carneval "Cool" Point</analysis_code_15>`,
+		},
+		"jsondecode": testTemplateStruct{
+			Template: `{{(json_decode .val).analysis_code_15}}`,
 			Values: map[string]interface{}{
 				"val": `{"analysis_code_15":"Carneval \"Cool\" Point"}`,
 			},
 			Result: `Carneval "Cool" Point`,
+		},
+		"jsonencode": testTemplateStruct{
+			Template: `{{json_encode .}}`,
+			Values: map[string]interface{}{
+				"analysis_code_15": "Carneval \"Cool\" Point",
+			},
+			Result: `{"analysis_code_15":"Carneval \"Cool\" Point"}`,
 		},
 		"divdec": testTemplateStruct{
 			Template: `{{$l := len .a}}Len: {{$l}}{{ $b := (div $l .b) }}{{ $a := (div $l .c) }} A+B={{ add $a $b | decimal "1,2" }}`,
