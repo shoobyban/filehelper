@@ -13,6 +13,10 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"replace": testTemplateStruct{
+			Template: `{{replace "aBcd" "B" "b"}}`,
+			Result: "abcd",
+		},
 		"map": testTemplateStruct{
 			Template: `{{ $m := createMap }}{{ $m := setItem $m "a" "b" }}{{ $m := setItem $m "c" "d" }}{{ range $i,$item := $m }} {{ $i }}:{{ $item }}{{ end }}`,
 			Result:   " a:b c:d",

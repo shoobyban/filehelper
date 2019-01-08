@@ -28,6 +28,7 @@ var fmap = template.FuncMap{
 	"sanitize":        sanitise,
 	"last":            last,
 	"reReplaceAll":    reReplaceAll,
+	"replace":         replace,
 	"match":           regexp.MatchString,
 	"title":           strings.Title,
 	"timestamp":       timestamp,
@@ -87,6 +88,10 @@ func (v *variable) Set(value interface{}) string {
 
 func newVariable(initialValue interface{}) *variable {
 	return &variable{initialValue}
+}
+
+func replace(input, from,to string) string {
+	return strings.Replace(input,from,to, -1)
 }
 
 func createMap() map[string]interface{} {
