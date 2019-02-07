@@ -33,6 +33,7 @@ func NewParser() *Parser {
 			},
 			"csv": func(content []byte) (interface{}, error) {
 				r := csvmap.NewReader(bytes.NewBuffer(content))
+				r.Reader.LazyQuotes = true
 				var err error
 				r.Columns, err = r.ReadHeader()
 				if err != nil {
