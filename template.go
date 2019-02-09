@@ -35,7 +35,7 @@ var fmap = template.FuncMap{
 	"datetime":        datetime,
 	"ukdatetime":      ukdatetime,
 	"ukdate":          ukdate,
-	"unixtimestamp":   timestamp,
+	"unixtimestamp":   unixtimestamp,
 	"nanotimestamp":   nanotimestamp,
 	"json":            asJSON,
 	"toUpper":         strings.ToUpper,
@@ -90,8 +90,8 @@ func newVariable(initialValue interface{}) *variable {
 	return &variable{initialValue}
 }
 
-func replace(input, from,to string) string {
-	return strings.Replace(input,from,to, -1)
+func replace(input, from, to string) string {
+	return strings.Replace(input, from, to, -1)
 }
 
 func createMap() map[string]interface{} {
