@@ -370,6 +370,9 @@ func mapto(item, mapvals, separators string) string {
 	mapping := map[string]string{}
 	for _, v := range maps {
 		vv := strings.Split(v, separators[1:])
+		if len(vv) < 1 {
+			return ""
+		}
 		mapping[vv[0]] = vv[1]
 	}
 	if ret, ok := mapping[item]; ok {
