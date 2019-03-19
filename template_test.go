@@ -13,9 +13,17 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"seq0123": testTemplateStruct{
+			Template: `{{range seq 0 3}}{{.}} {{ end }}`,
+			Result:   `0 1 2 3 `,
+		},
+		"seq123": testTemplateStruct{
+			Template: `{{range seq 3}}{{.}} {{ end }}`,
+			Result:   `1 2 3 `,
+		},
 		"replace": testTemplateStruct{
 			Template: `{{replace "aBcd" "B" "b"}}`,
-			Result: "abcd",
+			Result:   "abcd",
 		},
 		"map": testTemplateStruct{
 			Template: `{{ $m := createMap }}{{ $m := setItem $m "a" "b" }}{{ $m := setItem $m "c" "d" }}{{ range $i,$item := $m }} {{ $i }}:{{ $item }}{{ end }}`,
@@ -30,8 +38,14 @@ func TestTemplate(t *testing.T) {
 			Result:   "abc",
 		},
 		"reReplaceAll": testTemplateStruct{
-			Template: `{{reReplaceAll "cd" "1" "abcdef" }}`,
-			Result:   "ab1ef",
+			Template: `{{reReplaceAll "\"" "\\\"" .A }}`,
+			Values:   map[string]interface{}{"A": `ab"cd"ef`},
+			Result:   `ab\"cd\"ef`,
+		},
+		"reReplaceAll2": testTemplateStruct{
+			Template: `{{reReplaceAll "\"" "&quot;" .A }}`,
+			Values:   map[string]interface{}{"A": `ab"cd"ef`},
+			Result:   `ab&quot;cd&quot;ef`,
 		},
 		"timeformatminus": testTemplateStruct{
 			Template: `{{timeformatminus "02/01/06 15:04:05" 5 }}`,
