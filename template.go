@@ -75,6 +75,7 @@ var fmap = template.FuncMap{
 	"mkSlice":         mkSlice,
 	"escape":          escape,
 	"seq":             seq,
+	"url_path":        urlPath,
 }
 
 var fs afero.Fs
@@ -302,6 +303,16 @@ func fixlenright(length int, data interface{}) interface{} {
 		return fmt.Sprintf(fmt.Sprintf("%%%d.4f", length), data)
 	}
 	return strings.Repeat(" ", length)
+}
+
+func urlPath(title string) string {
+	reg, err := regexp.Compile("[^A-Za-z0-9]+")
+	if err != nil {
+		return ""
+	}
+	prettyurl := reg.ReplaceAllString(title, "-")
+	prettyurl = strings.ToLower(strings.Trim(prettyurl, "-"))
+	return prettyurl
 }
 
 func sanitise(str string) string {

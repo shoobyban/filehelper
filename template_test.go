@@ -13,6 +13,15 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"url_path": testTemplateStruct{
+			Template: `{{url_path "Some Nice - URL"}}`,
+			Result:   "some-nice-url",
+		},
+		"intf": testTemplateStruct{
+			Template: "{{if .A}}.{{end}}",
+			Values:   map[string]interface{}{"A": []interface{}{}, "B": 1},
+			Result:   "",
+		},
 		"seq0123": testTemplateStruct{
 			Template: `{{range seq 0 3}}{{.}} {{ end }}`,
 			Result:   `0 1 2 3 `,
