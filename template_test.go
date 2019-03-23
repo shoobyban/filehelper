@@ -13,6 +13,14 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"urlencode": testTemplateStruct{
+			Template: `{{urlencode "Some & % / - Query"}}`,
+			Result:   `Some+%26+%25+%2F+-+Query`,
+		},
+		"urldecode": testTemplateStruct{
+			Template: `{{urldecode "Some+%26+%25+%2F+-+Query"}}`,
+			Result:   `Some & % / - Query`,
+		},
 		"url_path": testTemplateStruct{
 			Template: `{{url_path "Some Nice - URL"}}`,
 			Result:   "some-nice-url",

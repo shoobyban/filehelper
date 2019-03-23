@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"reflect"
 	"regexp"
@@ -76,6 +77,8 @@ var fmap = template.FuncMap{
 	"escape":          escape,
 	"seq":             seq,
 	"url_path":        urlPath,
+	"urlencode":       urlencode,
+	"urldecode":       urldecode,
 }
 
 var fs afero.Fs
@@ -95,6 +98,18 @@ func newVariable(initialValue interface{}) *variable {
 
 func replace(input, from, to string) string {
 	return strings.Replace(input, from, to, -1)
+}
+
+func urlencode(s string) string {
+	return url.QueryEscape(s)
+}
+
+func urldecode(s string) (string, error) {
+	r, err := url.QueryUnescape(s)
+	if err != nil {
+		return "", err
+	}
+	return r, nil
 }
 
 // From Hugo with love see https://gohugo.io/functions/seq/
