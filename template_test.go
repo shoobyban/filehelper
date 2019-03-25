@@ -13,6 +13,11 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"md5": testTemplateStruct{
+			Template: `{{md5 .A}}`,
+			Values:   map[string]interface{}{"A": []interface{}{}, "B": 1},
+			Result:   `e1ec774f11a6f73495b68e24d59da466`,
+		},
 		"urlencode": testTemplateStruct{
 			Template: `{{urlencode "Some & % / - Query"}}`,
 			Result:   `Some+%26+%25+%2F+-+Query`,

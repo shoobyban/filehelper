@@ -2,6 +2,8 @@ package filehelper
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -79,6 +81,7 @@ var fmap = template.FuncMap{
 	"url_path":        urlPath,
 	"urlencode":       urlencode,
 	"urldecode":       urldecode,
+	"md5":             md5hash,
 }
 
 var fs afero.Fs
@@ -94,6 +97,12 @@ func (v *variable) Set(value interface{}) string {
 
 func newVariable(initialValue interface{}) *variable {
 	return &variable{initialValue}
+}
+
+func md5hash(data interface{}) string {
+	b := new(bytes.Buffer)
+	_ = gob.NewEncoder(b).Encode(data)
+	return fmt.Sprintf("%x", md5.Sum(b.Bytes()))
 }
 
 func replace(input, from, to string) string {
