@@ -3,7 +3,6 @@ package filehelper
 import (
 	"bytes"
 	"crypto/md5"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -100,9 +99,8 @@ func newVariable(initialValue interface{}) *variable {
 }
 
 func md5hash(data interface{}) string {
-	b := new(bytes.Buffer)
-	_ = gob.NewEncoder(b).Encode(data)
-	return fmt.Sprintf("%x", md5.Sum(b.Bytes()))
+	s := fmt.Sprintf("%#v", data)
+	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
 }
 
 func replace(input, from, to string) string {

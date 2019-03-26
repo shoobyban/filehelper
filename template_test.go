@@ -16,7 +16,7 @@ func TestTemplate(t *testing.T) {
 		"md5": testTemplateStruct{
 			Template: `{{md5 .A}}`,
 			Values:   map[string]interface{}{"A": []interface{}{}, "B": 1},
-			Result:   `e1ec774f11a6f73495b68e24d59da466`,
+			Result:   `456a37d61262ccf952ee9768cbe32d94`,
 		},
 		"urlencode": testTemplateStruct{
 			Template: `{{urlencode "Some & % / - Query"}}`,
