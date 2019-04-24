@@ -769,6 +769,7 @@ func ProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
+		defer tf.Close()
 		byteValue, err = ioutil.ReadAll(tf)
 	} else {
 		tf, err := fs.Open(template)
@@ -776,6 +777,7 @@ func ProcessTemplateFile(template string, bundle interface{}) ([]byte, error) {
 			return nil, err
 		}
 		byteValue, err = ioutil.ReadAll(tf)
+		defer tf.Close()
 	}
 	if err != nil {
 		return nil, err
@@ -795,6 +797,7 @@ func MustProcessTemplateFile(template string, bundle interface{}) string {
 	}
 	byteValue, _ := ioutil.ReadAll(tf)
 	output, _ := Template(string(byteValue), bundle)
+	defer tf.Close()
 	return output
 }
 
