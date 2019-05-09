@@ -77,10 +77,11 @@ var fmap = template.FuncMap{
 	"mkSlice":         mkSlice,
 	"escape":          escape,
 	"seq":             seq,
-	"url_path":        urlPath,
+	"url_path":        urlPath, // SEO, Slugify
 	"urlencode":       urlencode,
 	"urldecode":       urldecode,
 	"md5":             md5hash,
+	"json_escape":     JsonEscape,
 }
 
 var fs afero.Fs
@@ -725,6 +726,16 @@ func xmlDecode(s string) (interface{}, error) {
 func MustTemplate(str string, data interface{}) string {
 	ret, _ := Template(str, data)
 	return ret
+}
+
+// JsonEscape escapes a string for JSON
+func JsonEscape(i string) string {
+	b, err := json.Marshal(i)
+	if err != nil {
+		panic(err)
+	}
+	s := string(b)
+	return s[1 : len(s)-1]
 }
 
 // TemplateDelim parses string with custom delimiters as Go template, using data as scope

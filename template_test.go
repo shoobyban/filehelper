@@ -13,6 +13,12 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"json_escape": testTemplateStruct{
+			Template: `{{json_escape .A}}`,
+			Values: map[string]interface{}{"A": `dog "fish"
+ cat`},
+			Result: `dog \"fish\"\n cat`,
+		},
 		"md5": testTemplateStruct{
 			Template: `{{md5 .A}}`,
 			Values:   map[string]interface{}{"A": []interface{}{}, "B": 1},
