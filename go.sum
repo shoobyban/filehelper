@@ -1,5 +1,7 @@
+github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/kennygrant/sanitize v1.2.4 h1:gN25/otpP5vAsO2djbMhF/LQX6R7+O1TB4yv8NzpJ3o=
 github.com/kennygrant/sanitize v1.2.4/go.mod h1:LGsjYYtgxbetdg5owWB2mpgUL6e2nfw2eObZ0u0qvak=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9 h1:cvht1GrOF8MbAgDvN6flt1sj9Aixv/SokD/XqH6MXIQ=
 github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9/go.mod h1:Voxo2KUk+o0x2taVupAT82GWwNK6Nv7LFwZHyJduxnY=
 github.com/shoobyban/mxj v1.8.5 h1:zAsGPjVTcsHO25DwQiX1TBgTTNhnZ0ElJ8tc05u+gZw=
@@ -8,6 +10,9 @@ github.com/shoobyban/slog v0.0.0-20190209173919-7f513f7a44c1 h1:mPLIPkJhNNBl477M
 github.com/shoobyban/slog v0.0.0-20190209173919-7f513f7a44c1/go.mod h1:262Gnlo2g3UKb2sfzPx6aWuybU0xilZraiw7SPUXRIU=
 github.com/spf13/afero v1.2.1 h1:qgMbHoJbPbw579P+1zVY+6n4nIFuIchaIjzZ/I/Yq8M=
 github.com/spf13/afero v1.2.1/go.mod h1:9ZxEEn6pIJ8Rxe320qSDBk6AsU0r9pR7Q4OcevTdifk=
+github.com/spf13/cast v1.3.0 h1:oget//CVOEoFewqQxwr0Ej5yjygnqGkvggSE/gB35Q8=
+github.com/spf13/cast v1.3.0/go.mod h1:Qx5cxh0v+4UWYiBimWS+eyWzqEqokIECu5etghLkUJE=
+github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 golang.org/x/net v0.0.0-20190206173232-65e2d4e15006 h1:bfLnR+k0tq5Lqt6dflRLcZiz6UaXCMt3vhYJ1l4FQ80=
 golang.org/x/net v0.0.0-20190206173232-65e2d4e15006/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/text v0.3.0 h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=

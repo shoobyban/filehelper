@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/recursionpharma/go-csv-map"
+	csvmap "github.com/recursionpharma/go-csv-map"
 	"github.com/shoobyban/mxj"
 	"github.com/shoobyban/slog"
 )

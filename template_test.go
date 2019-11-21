@@ -13,6 +13,11 @@ type testTemplateStruct struct {
 
 func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
+		"xml_array": testTemplateStruct{
+			Template: `{{xml_array .A "products" "product"}}`,
+			Values:   map[string]interface{}{"A": []interface{}{map[string]interface{}{"z": 1, "p": "a"}, map[string]interface{}{"z": 2, "p": "b"}}},
+			Result:   "<?xml version=\"1.0\"?>\n<products>\n  <product>\n    <p>a</p>\n    <z>1</z>\n  </product>\n  <product>\n    <p>b</p>\n    <z>2</z>\n  </product>\n</products>",
+		},
 		"json_escape": testTemplateStruct{
 			Template: `{{json_escape .A}}`,
 			Values: map[string]interface{}{"A": `dog "fish"

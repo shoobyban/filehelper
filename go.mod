@@ -6,5 +6,8 @@ require (
 	github.com/shoobyban/mxj v1.8.5
 	github.com/shoobyban/slog v0.0.0-20190209173919-7f513f7a44c1
 	github.com/spf13/afero v1.2.1
+	github.com/spf13/cast v1.3.0
 	golang.org/x/net v0.0.0-20190206173232-65e2d4e15006 // indirect
 )
+
+go 1.13

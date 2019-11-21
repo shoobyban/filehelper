@@ -68,6 +68,7 @@ var fmap = template.FuncMap{
 	"json_encode":     jsonEncode,
 	"xml_decode":      xmlDecode,
 	"xml_encode":      xmlEncode,
+	"xml_array":       xmlArray,
 	"in_array":        inArray,
 	"timeformat":      timeFormat,
 	"timeformatminus": timeFormatMinus,
@@ -703,6 +704,12 @@ func xmlEncode(v interface{}) (string, error) {
 	mv := mxj.Map(v.(map[string]interface{}))
 	b, err := mv.Xml()
 	return string(b), err
+}
+
+func xmlArray(v interface{}, roottag, itemtag string) (string, error) {
+	mv := mxj.Map(map[string]interface{}{itemtag: v.([]interface{})})
+	b, err := mv.XmlIndent("", "  ", roottag)
+	return "<?xml version=\"1.0\"?>\n" + string(b), err
 }
 
 func decode(s, format string) (interface{}, error) {

@@ -7,6 +7,8 @@
 See (limited) tests for example usage. This package is used by some other projects, you might find it useful as well, but it's borderline antipattern.
 
 Main responsibilities:
+
 * read and write csv
 * unified file read for csv, xml or json with extendible parsing
 * template parsing with handy functions - see tests
+* transliterate foreign characters
