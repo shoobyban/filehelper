@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -14,7 +15,7 @@ import (
 )
 
 // WriteCSV writes headers and rows into a given file handle and reads it back as []byte
-func WriteCSV(file *os.File, columns []string, rows []map[string]interface{}) ([]byte, error) {
+func WriteCSV(file io.ReadWriter, columns []string, rows []map[string]interface{}) ([]byte, error) {
 	w := csv.NewWriter(file)
 	err := OnlyWriteCSV(*w, columns, rows)
 	if err != nil {
@@ -27,6 +28,7 @@ func WriteCSV(file *os.File, columns []string, rows []map[string]interface{}) ([
 // ReadCSV reads csv into []map[string]string + []string for headers
 func ReadCSV(filename string) ([]map[string]string, []string, error) {
 	csvFile, err := os.Open(filename)
+	defer csvFile.Close()
 	if err != nil {
 		return nil, nil, err
 	}
