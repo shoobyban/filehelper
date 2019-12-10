@@ -702,12 +702,14 @@ func jsonEncode(v interface{}) (string, error) {
 
 func xmlEncode(v interface{}) (string, error) {
 	mv := mxj.Map(v.(map[string]interface{}))
+	mxj.XMLEscapeChars(true)
 	b, err := mv.Xml()
 	return string(b), err
 }
 
 func xmlArray(v interface{}, roottag, itemtag string) (string, error) {
 	mv := mxj.Map(map[string]interface{}{itemtag: v.([]interface{})})
+	mxj.XMLEscapeChars(true)
 	b, err := mv.XmlIndent("", "  ", roottag)
 	return "<?xml version=\"1.0\"?>\n" + string(b), err
 }

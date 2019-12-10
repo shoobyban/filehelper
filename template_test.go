@@ -15,8 +15,8 @@ func TestTemplate(t *testing.T) {
 	tests := map[string]testTemplateStruct{
 		"xml_array": testTemplateStruct{
 			Template: `{{xml_array .A "products" "product"}}`,
-			Values:   map[string]interface{}{"A": []interface{}{map[string]interface{}{"z": 1, "p": "a"}, map[string]interface{}{"z": 2, "p": "b"}}},
-			Result:   "<?xml version=\"1.0\"?>\n<products>\n  <product>\n    <p>a</p>\n    <z>1</z>\n  </product>\n  <product>\n    <p>b</p>\n    <z>2</z>\n  </product>\n</products>",
+			Values:   map[string]interface{}{"A": []interface{}{map[string]interface{}{"z": 1, "p": "a & b"}, map[string]interface{}{"z": 2, "p": "b"}}},
+			Result:   "<?xml version=\"1.0\"?>\n<products>\n  <product>\n    <p>a &amp; b</p>\n    <z>1</z>\n  </product>\n  <product>\n    <p>b</p>\n    <z>2</z>\n  </product>\n</products>",
 		},
 		"json_escape": testTemplateStruct{
 			Template: `{{json_escape .A}}`,
@@ -106,7 +106,7 @@ func TestTemplate(t *testing.T) {
 		"xmldecode": testTemplateStruct{
 			Template: `{{(xml_decode .val).analysis_code_15}}`,
 			Values: map[string]interface{}{
-				"val": `<?xml version=\"1.0\"?><analysis_code_15>Carneval "Cool" Point</analysis_code_15>`,
+				"val": `<?xml version=\"1.0\"?><analysis_code_15>Carneval &quot;Cool&quot; Point</analysis_code_15>`,
 			},
 			Result: `Carneval "Cool" Point`,
 		},
@@ -115,7 +115,7 @@ func TestTemplate(t *testing.T) {
 			Values: map[string]interface{}{
 				"analysis_code_15": "Carneval \"Cool\" Point",
 			},
-			Result: `<analysis_code_15>Carneval "Cool" Point</analysis_code_15>`,
+			Result: `<analysis_code_15>Carneval &quot;Cool&quot; Point</analysis_code_15>`,
 		},
 		"jsondecode": testTemplateStruct{
 			Template: `{{(json_decode .val).analysis_code_15}}`,
