@@ -63,6 +63,7 @@ func (l *Parser) ReadStruct(filename, format string) (interface{}, error) {
 
 // ParseStruct parses byte slice into map or slice
 func (l *Parser) ParseStruct(content io.Reader, format string) (interface{}, error) {
+	fmt.Println("CONTENT", content)
 	byteValue, _ := ioutil.ReadAll(content)
 	var out interface{}
 	var err error
