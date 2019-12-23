@@ -1,4 +1,4 @@
-module github.com/shoobyban/filehelper
+module github.com/tamaslaczko/filehelper
 
 require (
 	github.com/kennygrant/sanitize v1.2.4
