@@ -37,7 +37,7 @@ func NewParser() *Parser {
 				var err error
 				r.Columns, err = r.ReadHeader()
 				if err != nil {
-					slog.Errorf("Error reading csv header %v", err)
+					slog.Errorf("Error reading csv headerxx %v", err)
 				}
 				return r.ReadAll()
 			},
@@ -63,7 +63,6 @@ func (l *Parser) ReadStruct(filename, format string) (interface{}, error) {
 
 // ParseStruct parses byte slice into map or slice
 func (l *Parser) ParseStruct(content io.Reader, format string) (interface{}, error) {
-	fmt.Println("CONTENT", content)
 	byteValue, _ := ioutil.ReadAll(content)
 	var out interface{}
 	var err error
