@@ -37,7 +37,7 @@ func NewParser() *Parser {
 				var err error
 				r.Columns, err = r.ReadHeader()
 				if err != nil {
-					slog.Errorf("Error reading csv headerxx %v", err)
+					slog.Errorf("Error reading csv header %v", err)
 				}
 				return r.ReadAll()
 			},
