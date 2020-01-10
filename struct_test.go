@@ -60,7 +60,7 @@ func TestParseStruct(t *testing.T) {
 					[]string{"c", "5"}},
 			},
 			Reg: map[string]ParserFunc{
-				"bfk": func(content []byte) (interface{}, error) {
+				"bfk": func(content io.Reader) (interface{}, error) {
 					ret := map[string]interface{}{}
 					lines := strings.Split(string(content), "\n")
 					for _, line := range lines {

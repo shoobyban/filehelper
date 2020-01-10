@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -57,16 +58,16 @@ func (l *Parser) ReadStruct(filename, format string) (interface{}, error) {
 		return nil, err
 	}
 	defer f.Close()
-	byteValue, _ := ioutil.ReadAll(f)
-	return l.ParseStruct(byteValue, format)
+	return l.ParseStruct(f, format)
 }
 
 // ParseStruct parses byte slice into map or slice
-func (l *Parser) ParseStruct(content []byte, format string) (interface{}, error) {
+func (l *Parser) ParseStruct(content io.Reader, format string) (interface{}, error) {
+	byteValue, _ := ioutil.ReadAll(content)
 	var out interface{}
 	var err error
 	if parser, ok := l.parsers[format]; ok {
-		out, err = parser(content)
+		out, err = parser(byteValue)
 	} else {
 		return nil, errors.New("Unknown file")
 	}

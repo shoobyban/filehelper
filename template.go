@@ -716,7 +716,7 @@ func xmlArray(v interface{}, roottag, itemtag string) (string, error) {
 
 func decode(s, format string) (interface{}, error) {
 	p := NewParser()
-	res, err := p.ParseStruct([]byte(s), format)
+	res, err := p.ParseStruct(strings.NewReader(s), format)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to parse json '%s': %v", s, err)
 	}
